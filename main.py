@@ -1,29 +1,34 @@
 import streamlit as st
 
-def calculate_gpa(marks, credits):
+def calculate_gpa(marks, total_marks, credits):
     total_points = 0
     total_credits = 0
-    for mark, credit in zip(marks, credits):
-        # Convert marks to grade points (simple scale)
-        if mark >= 90:
+    for mark, total, credit in zip(marks, total_marks, credits):
+        percentage = (mark / total) * 100
+        # GPA scale
+        if percentage >= 90:
             grade_point = 4.0
-        elif mark >= 80:
-            grade_point = 3.5
-        elif mark >= 70:
+        elif percentage >= 85:
+            grade_point = 3.7
+        elif percentage >= 80:
+            grade_point = 3.3
+        elif percentage >= 75:
             grade_point = 3.0
-        elif mark >= 60:
-            grade_point = 2.5
-        elif mark >= 50:
+        elif percentage >= 70:
+            grade_point = 2.7
+        elif percentage >= 65:
+            grade_point = 2.3
+        elif percentage >= 60:
             grade_point = 2.0
+        elif percentage >= 50:
+            grade_point = 1.5
         else:
             grade_point = 0.0
 
         total_points += grade_point * credit
         total_credits += credit
 
-    if total_credits == 0:
-        return 0
-    return round(total_points / total_credits, 2)
+    return round(total_points / total_credits, 2) if total_credits != 0 else 0
 
 
 def calculate_cgpa(gpas, credits_list):
@@ -32,10 +37,7 @@ def calculate_cgpa(gpas, credits_list):
     for gpa, credit in zip(gpas, credits_list):
         total_points += gpa * credit
         total_credits += credit
-
-    if total_credits == 0:
-        return 0
-    return round(total_points / total_credits, 2)
+    return round(total_points / total_credits, 2) if total_credits != 0 else 0
 
 
 st.title("GPA & CGPA Calculator")
@@ -46,14 +48,16 @@ if option == "Calculate GPA":
     num_subjects = st.number_input("Enter number of subjects:", min_value=1, step=1)
     
     marks = []
+    total_marks = []
     credits = []
     
     for i in range(int(num_subjects)):
-        marks.append(st.number_input(f"Marks for subject {i+1}:", min_value=0, max_value=100, step=1))
+        marks.append(st.number_input(f"Marks obtained for subject {i+1}:", min_value=0, step=1))
+        total_marks.append(st.number_input(f"Total marks for subject {i+1}:", min_value=1, value=100, step=1))
         credits.append(st.number_input(f"Credit hours for subject {i+1}:", min_value=1, step=1))
     
     if st.button("Calculate GPA"):
-        gpa = calculate_gpa(marks, credits)
+        gpa = calculate_gpa(marks, total_marks, credits)
         st.success(f"Your GPA for this semester is: {gpa}")
 
 
